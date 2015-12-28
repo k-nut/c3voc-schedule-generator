@@ -155,11 +155,12 @@ def process_wiki_events(events, sessions):
                 fsdr[room] = list();
 
             # Break if conference day date and event date do not match
-            conference_day_date = workshop_schedule["schedule"]["conference"]["days"][day]["date"]
-            event_n_date = event_n.get('date')
-            if conference_day_date not in event_n_date:
-                raise Exception("Current conference day {0} does not match current event {1} with date {2}."
-                    .format(conference_day_date, event_n["id"], event_n_date))
+            conference_day_start = dateutil.parser.parse(workshop_schedule["schedule"]["conference"]["days"][day]["day_start"])
+            conference_day_end = dateutil.parser.parse(workshop_schedule["schedule"]["conference"]["days"][day]["day_end"])
+            event_n_date = dateutil.parser.parse(event_n.get('date'))
+            if not conference_day_start <= event_n_date < conference_day_end:
+                raise Exception("Current conference day from {0} to {1} does not match current event {2} with date {3}."
+                    .format(conference_day_start, conference_day_end, event_n["id"], event_n_date))
 
             fsdr[room].append(event_n);
             
